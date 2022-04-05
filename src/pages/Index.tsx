@@ -1,55 +1,64 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Flag from "../components/Flag";
 import Loading from "../components/Loading";
-import NavBar from "../components/NavBar";
 import Search from "../components/Search";
+import Countrie from "../interfaces/Countrie";
+import { motion } from "framer-motion";
 
-function Index() {
+type Props = {
+  listCountrie: Countrie[];
+};
+
+function Index(props: Props) {
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState(0);
-  const [tabPays, setTabPays] = useState<any[]>([]);
-  const [chargement, setChargement] = useState(true);
+  const [filter, setFilter] = useState(-1);
+  const [allImageLoad, setAllImageLoad] = useState(false);
 
-  const tabRegion = ["Africa", "Americas", "Asia", "Europe", "Oceania"];
+  const listRegion = ["Africa", "Americas", "Asia", "Europe", "Oceania"];
 
   useEffect(() => {
-    (async () => {
-      const res = await fetch("https://restcountries.com/v2/all");
-      setTabPays(await res.json());
-      setTimeout(() => setChargement(false));
-    })();
+    let imgLoad = 0;
+    document.querySelectorAll("img").forEach((img) => {
+      img.addEventListener("load", () => {
+        imgLoad++;
+        if (imgLoad === 250) setAllImageLoad(true);
+      });
+    });
   }, []);
 
   return (
-    <div className="min-h-screen">
-      <NavBar />
-      <Search
-        setSearch={(value: string) => setSearch(value)}
-        setFilter={(value: number) => setFilter(value)}
-      />
-      {chargement ? (
-        <Loading />
-      ) : (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      {!allImageLoad && <Loading></Loading>}
+      <div className={!allImageLoad ? "invisible" : "visible"}>
+        <Search
+          setSearch={(value: string) => setSearch(value)}
+          setFilter={(value: number) => setFilter(value)}
+        />
         <ul className="container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-y-14 gap-x-14 mt-16">
-          {tabPays
+          {props.listCountrie
             .filter(
               (pays) =>
-                new RegExp(search, "i").test(pays.name as string) &&
-                (filter === -1 || (pays.region as string) === tabRegion[filter])
+                new RegExp(search, "i").test(pays.name) &&
+                (filter === -1 || pays.region === listRegion[filter])
             )
             .map((pays, i) => (
               <Flag
+                numero={pays.numero}
                 key={i}
-                name={pays.name as string}
-                capital={pays.capital as string}
-                region={pays.region as string}
-                numberPopulation={pays.population as number}
-                linkImage={pays.flags.png as string}
+                name={pays.name}
+                capital={pays.capital}
+                region={pays.region}
+                numberPopulation={pays.population}
+                linkImage={i === 5 ? pays.flags.png : pays.flags.svg}
               />
             ))}
         </ul>
-      )}
-    </div>
+      </div>
+    </motion.div>
   );
 }
 

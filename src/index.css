@@ -7,5 +7,6 @@
 body {
   font-family: "Nunito Sans", sans-serif;
   font-weight: 300;
+  overflow-x: hidden;
   @apply bg-very-light-gray dark:bg-very-dark-blue-1 text-very-dark-blue-2 dark:text-white tracking-wide transition-colors;
 }

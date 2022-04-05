@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 type Props = {
+  numero: number;
   linkImage: string;
   name: string;
   numberPopulation: number;
@@ -7,13 +10,20 @@ type Props = {
 };
 
 function Flag(props: Props) {
+  const navigate = useNavigate();
+
   return (
-    <li className="rounded overflow-hidden shadow w-full bg-white dark:bg-dark-blue">
-      <img
-        src={props.linkImage}
-        alt="drapeau"
-        className="w-full aspect-video object-cover"
-      />
+    <li
+      className="rounded overflow-hidden shadow w-full bg-white dark:bg-dark-blue cursor-pointer group"
+      onClick={() => navigate("/" + props.numero)}
+    >
+      <div className="w-full aspect-video overflow-hidden">
+        <img
+          src={props.linkImage}
+          alt="drapeau"
+          className="w-full aspect-video object-cover transition-transform group-hover:scale-105"
+        />
+      </div>
       <div className="px-8 pt-4 pb-8 text-petit">
         <h2 className="font-extrabold">{props.name}</h2>
         <ul className="mt-4">
